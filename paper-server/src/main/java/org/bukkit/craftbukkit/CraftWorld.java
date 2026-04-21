@@ -337,7 +337,11 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     private boolean setSpawnLocation(int x, int y, int z, float yaw, float pitch) {
         try {
-            this.world.setRespawnData(LevelData.RespawnData.of(this.world.dimension(), new BlockPos(x, y, z), yaw, pitch));
+            Location previousLocation = this.getSpawnLocation();
+            this.world.serverLevelData.setSpawn(LevelData.RespawnData.of(this.world.dimension(), new BlockPos(x, y, z), yaw, pitch));
+
+            this.server.getServer().updateEffectiveRespawnData();
+            new SpawnChangeEvent(this, previousLocation).callEvent();
             return true;
         } catch (Exception e) {
             return false;

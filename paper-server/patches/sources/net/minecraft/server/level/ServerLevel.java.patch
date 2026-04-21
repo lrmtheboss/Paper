@@ -987,16 +987,15 @@
          this.getServer().getDataStorage().set(MapItemSavedData.type(id), data);
      }
  
-@@ -1492,7 +_,21 @@
+@@ -1492,7 +_,20 @@
  
      @Override
      public void setRespawnData(final LevelData.RespawnData respawnData) {
 -        this.getServer().setRespawnData(respawnData);
 +        // Paper start
-+        final LevelData.RespawnData previousRespawnData = this.serverLevelData.getRespawnData();
-+        this.serverLevelData.setSpawn(respawnData);
-+        if (!previousRespawnData.positionEquals(respawnData)) {
++        if (!this.serverLevelData.getRespawnData().positionEquals(respawnData)) {
 +            org.bukkit.Location previousLocation = this.getWorld().getSpawnLocation();
++            this.serverLevelData.setSpawn(respawnData);
 +            this.server.getPlayerList().broadcastAll(new net.minecraft.network.protocol.game.ClientboundSetDefaultSpawnPositionPacket(respawnData), this.dimension());
 +            this.server.updateEffectiveRespawnData();
 +            new org.bukkit.event.world.SpawnChangeEvent(this.getWorld(), previousLocation).callEvent();
