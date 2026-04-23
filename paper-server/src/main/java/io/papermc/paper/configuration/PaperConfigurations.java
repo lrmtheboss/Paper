@@ -51,6 +51,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -150,7 +151,7 @@ public class PaperConfigurations extends Configurations<GlobalConfiguration, Wor
         """;
 
     @VisibleForTesting
-    public static final Supplier<SpigotWorldConfig> SPIGOT_WORLD_DEFAULTS = Suppliers.memoize(() -> new SpigotWorldConfig(RandomStringUtils.randomAlphabetic(255), Key.key(RandomStringUtils.randomAlphabetic(255).toLowerCase())) {
+    public static final Supplier<SpigotWorldConfig> SPIGOT_WORLD_DEFAULTS = Suppliers.memoize(() -> new SpigotWorldConfig(RandomStringUtils.randomAlphabetic(255), Key.key(RandomStringUtils.randomAlphabetic(255).toLowerCase(Locale.ROOT))) {
         @Override // override to ensure "verbose" is false
         public void init() {
             SpigotConfig.readConfig(SpigotWorldConfig.class, this);
