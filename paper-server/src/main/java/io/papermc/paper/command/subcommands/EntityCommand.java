@@ -94,8 +94,9 @@ public final class EntityCommand implements PaperSubcommand {
                 return;
             }
             Map<Identifier, MutablePair<Integer, Map<ChunkPos, Integer>>> list = Maps.newHashMap();
-            @Nullable World bukkitWorld = Bukkit.getWorld(NamespacedKey.fromString(worldName));
-            if (bukkitWorld == null) {
+            @Nullable NamespacedKey worldKey = NamespacedKey.fromString(worldName);
+            @Nullable World bukkitWorld;
+            if (worldKey == null || (bukkitWorld = Bukkit.getWorld(worldKey)) == null) {
                 sender.sendMessage(text("Could not load world for " + worldName + ". Please select a valid world.", RED));
                 sender.sendMessage(text("Usage: /paper entity list [filter] [worldKey]", RED));
                 return;

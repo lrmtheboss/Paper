@@ -23838,7 +23838,7 @@ index 3c1490ac7c259da04031db2f170e0c0a5f512191..470d7c770ae9d045b97e2df145cfe3cf
          }
      }
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index ceb6d955ef275802e549fb9d3e653cc3dda92dad..b4bd3b788a86458ece580693baf164195b730e22 100644
+index e5925d778c28bd19ee4cb911fb115edc6351c26b..b4d7ccc2fd9e6c928445b09dbc6ac896c81fc2ef 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -191,7 +191,7 @@ import net.minecraft.world.scores.ScoreboardSaveData;

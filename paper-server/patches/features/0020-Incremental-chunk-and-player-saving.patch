@@ -5,7 +5,7 @@ Subject: [PATCH] Incremental chunk and player saving
 
 
 diff --git a/net/minecraft/server/MinecraftServer.java b/net/minecraft/server/MinecraftServer.java
-index def29f67aa4d901fd61cb546f65b763b3da09131..a3edf217dd2ffce19dc1111402975ba12bb86bad 100644
+index 40a500011e7fcb6f5b07ff289f737ed9d3550296..da8c04aa02032c4c582709727f8f7f0b66b697b1 100644
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
 @@ -958,7 +958,7 @@ public abstract class MinecraftServer extends ReentrantBlockableEventLoop<TickTa
@@ -94,7 +94,7 @@ index def29f67aa4d901fd61cb546f65b763b3da09131..a3edf217dd2ffce19dc1111402975ba1
          ProfilerFiller profiler = Profiler.get();
          this.server.spark.executeMainThreadTasks(); // Paper - spark
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index cfc30654917703a9278143a2c36d37eb719ee061..78021db10860396fef4eb2e01926fbad123916fa 100644
+index ffe3ae41dd3d8c4141f81edf0b92001db957ebac..98461e8468a7eeaef2544ee907ff64de1fd42a49 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
 @@ -1441,6 +1441,15 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet

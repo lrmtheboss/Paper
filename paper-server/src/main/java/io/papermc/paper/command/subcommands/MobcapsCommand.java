@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.ToIntFunction;
+import net.kyori.adventure.key.Key;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.JoinConfiguration;
@@ -91,7 +92,7 @@ public final class MobcapsCommand implements PaperSubcommand {
             if (sender instanceof Player player) {
                 worlds = List.of(player.getWorld());
             } else {
-                sender.sendMessage(Component.text("Must specify a world! ex: '/paper mobcaps world'", NamedTextColor.RED));
+                sender.sendMessage(Component.text("Must specify a world! ex: '/paper mobcaps overworld'", NamedTextColor.RED));
                 return;
             }
         } else if (args.length == 1) {
@@ -99,8 +100,9 @@ public final class MobcapsCommand implements PaperSubcommand {
             if (input.equals("*")) {
                 worlds = Bukkit.getWorlds();
             } else {
-                final @Nullable World world = Bukkit.getWorld(input);
-                if (world == null) {
+                final @Nullable Key worldKey = NamespacedKey.fromString(input);
+                final @Nullable World world;
+                if (worldKey == null || (world = Bukkit.getWorld(worldKey)) == null) {
                     sender.sendMessage(Component.text("'" + input + "' is not a valid world!", NamedTextColor.RED));
                     return;
                 } else {
