@@ -170,21 +170,20 @@ public class CraftWorld extends CraftRegionAccessor implements World {
         .resolving(net.kyori.adventure.identity.Identity.UUID, World::getUID)
         .build();
 
-    private final ServerLevel world;
-    private WorldBorder worldBorder;
-    private Environment environment;
     private final CraftServer server = (CraftServer) Bukkit.getServer();
-    private final @Nullable ChunkGenerator generator;
     private final @Nullable BiomeProvider biomeProvider;
     private final List<BlockPopulator> populators = new ArrayList<>();
     private final BlockMetadataStore blockMetadata = new BlockMetadataStore(this);
     private final Object2IntOpenHashMap<SpawnCategory> spawnCategoryLimit = new Object2IntOpenHashMap<>();
     private final CraftPersistentDataContainer persistentDataContainer = new CraftPersistentDataContainer(CraftWorld.DATA_TYPE_REGISTRY);
+    private final ServerLevel world;
+    private final NamespacedKey key;
+    private final Environment environment;
+    private WorldBorder worldBorder;
     // Paper start - void damage configuration
     private boolean voidDamageEnabled;
     private float voidDamageAmount;
     private double voidDamageMinBuildHeightOffset;
-    private final NamespacedKey key;
 
     @Override
     public boolean isVoidDamageEnabled() {
@@ -297,10 +296,9 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     private static final Random rand = new Random();
 
-    public CraftWorld(ServerLevel world, @Nullable ChunkGenerator generator, @Nullable BiomeProvider biomeProvider, Environment environment) {
+    public CraftWorld(ServerLevel world, Identifier identifier, @Nullable BiomeProvider biomeProvider, Environment environment) {
         this.world = world;
-        this.key = CraftNamespacedKey.fromMinecraft(this.world.dimension().identifier());
-        this.generator = generator;
+        this.key = CraftNamespacedKey.fromMinecraft(identifier);
         this.biomeProvider = biomeProvider;
 
         this.environment = environment;
@@ -875,7 +873,7 @@ public class CraftWorld extends CraftRegionAccessor implements World {
 
     @Override
     public @Nullable ChunkGenerator getGenerator() {
-        return this.generator;
+        return this.world.generator;
     }
 
     @Override
