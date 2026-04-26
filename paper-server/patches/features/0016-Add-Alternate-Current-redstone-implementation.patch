@@ -2326,18 +2326,18 @@ index 0000000000000000000000000000000000000000..298076a0db4e6ee6e4775ac43bf749d9
 +    }
 +}
 diff --git a/net/minecraft/server/level/ServerLevel.java b/net/minecraft/server/level/ServerLevel.java
-index 26c05173e7fb2bf055afda1717af0dd2e997118d..ffe3ae41dd3d8c4141f81edf0b92001db957ebac 100644
+index f1341c78e90e0f7d6d2b27e6fff57bf6999f7176..12e6162e82dd639ac34da6466fc201623f4682c5 100644
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -232,6 +232,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
-     public final WorldGenSettings worldGenSettings;
+@@ -233,6 +233,7 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+     private @Nullable ServerClockManager clockManager;
      public boolean hasPhysicsEvent = true; // Paper - BlockPhysicsEvent
      public boolean hasEntityMoveEvent; // Paper - Add EntityMoveEvent
 +    private final alternate.current.wire.WireHandler wireHandler = new alternate.current.wire.WireHandler(this); // Paper - optimize redstone (Alternate Current)
  
      @Override
      public @Nullable LevelChunk getChunkIfLoaded(int x, int z) {
-@@ -2765,6 +2766,13 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
+@@ -2772,6 +2773,13 @@ public class ServerLevel extends Level implements WorldGenLevel, ServerEntityGet
          return this.debugSynchronizers;
      }
  

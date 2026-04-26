@@ -192,9 +192,14 @@ public class GlobalConfiguration extends ConfigurationPart {
 
     public class Commands extends ConfigurationPart {
         public boolean suggestPlayerNamesWhenNullTabCompletions = true;
-        public boolean timeCommandAffectsAllWorlds = false;
         @Comment("Allow mounting entities to a player in the Vanilla '/ride' command.")
         public boolean rideCommandAllowPlayerAsVehicle = false;
+    }
+
+    public Time time;
+
+    public class Time extends ConfigurationPart {
+        public boolean affectsAllWorlds = false;
     }
 
     public Scoreboards scoreboards;
