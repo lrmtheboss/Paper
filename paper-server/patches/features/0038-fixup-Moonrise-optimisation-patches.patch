@@ -1,0 +1,83 @@
+From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From: Spottedleaf <Spottedleaf@users.noreply.github.com>
+Date: Sat, 26 Sep 2026 13:30:10 -0700
+Subject: [PATCH] fixup! Moonrise optimisation patches
+
+
+diff --git a/net/minecraft/server/level/ServerChunkCache.java b/net/minecraft/server/level/ServerChunkCache.java
+index 66d706d2a7995b437d102903012a714c38e4876c..c4cfb53e145d69666ffc27ef4ee0c50b54eb9143 100644
+--- a/net/minecraft/server/level/ServerChunkCache.java
++++ b/net/minecraft/server/level/ServerChunkCache.java
+@@ -350,26 +350,39 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+         Arrays.fill(this.lastChunk, null);
+     }
+ 
+-    public CompletableFuture<ChunkResult<ChunkAccess>> getChunkFuture(final int x, final int z, final ChunkStatus targetStatus, final boolean loadOrGenerate) {
+-        boolean isMainThread = Thread.currentThread() == this.mainThread;
+-        CompletableFuture<ChunkResult<ChunkAccess>> serverFuture;
+-        if (isMainThread) {
+-            serverFuture = this.getChunkFutureMainThread(x, z, targetStatus, loadOrGenerate);
+-            this.mainThreadProcessor.managedBlock(serverFuture::isDone);
++    // Paper start - rewrite chunk system
++    public CompletableFuture<ChunkResult<ChunkAccess>> getChunkFuture(final int chunkX, final int chunkZ,
++                                                                      final ChunkStatus toStatus,
++                                                                      final boolean create) {
++        if (ca.spottedleaf.moonrise.common.util.TickThread.isTickThreadFor(this.level, chunkX, chunkZ)) {
++            final CompletableFuture<ChunkResult<ChunkAccess>> ret = this.getChunkFutureInternal(chunkX, chunkZ, toStatus, create, true);
++            this.mainThreadProcessor.managedBlock(ret::isDone);
++            return ret;
+         } else {
+-            serverFuture = CompletableFuture.<CompletableFuture<ChunkResult<ChunkAccess>>>supplyAsync(
+-                    () -> this.getChunkFutureMainThread(x, z, targetStatus, loadOrGenerate), this.mainThreadProcessor
+-                )
+-                .thenCompose(chunk -> (CompletionStage<ChunkResult<ChunkAccess>>)chunk);
++            final CompletableFuture<ChunkResult<ChunkAccess>> ret = new CompletableFuture<>();
++            ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getChunkTaskScheduler().scheduleChunkTask(chunkX, chunkZ, () -> {
++                ServerChunkCache.this.getChunkFutureInternal(chunkX, chunkZ, toStatus, create, false).whenComplete((c, t) -> {
++                    if (t != null) {
++                        ret.completeExceptionally(t);
++                    } else {
++                        ret.complete(c);
++                    }
++                });
++            });
++            return ret;
+         }
++    }
+ 
+-        return serverFuture;
++    public CompletableFuture<ChunkResult<ChunkAccess>> getChunkFutureMainThread(final int chunkX, final int chunkZ,
++                                                                                final ChunkStatus toStatus,
++                                                                                final boolean create) {
++        return this.getChunkFutureInternal(chunkX, chunkZ, toStatus, create, false);
+     }
+ 
+-    private CompletableFuture<ChunkResult<ChunkAccess>> getChunkFutureMainThread(
+-        final int x, final int z, final ChunkStatus targetStatus, final boolean loadOrGenerate
++
++    private CompletableFuture<ChunkResult<ChunkAccess>> getChunkFutureInternal(
++        final int x, final int z, final ChunkStatus targetStatus, final boolean loadOrGenerate, final boolean intendingToBlock
+     ) {
+-        // Paper start - rewrite chunk system
+         ca.spottedleaf.moonrise.common.util.TickThread.ensureTickThread(this.level, x, z, "Scheduling chunk load off-main");
+ 
+         final int minLevel = ChunkLevel.byStatus(targetStatus);
+@@ -395,7 +408,7 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+ 
+             ((ca.spottedleaf.moonrise.patches.chunk_system.level.ChunkSystemServerLevel)this.level).moonrise$getChunkTaskScheduler().scheduleChunkLoad(
+                 x, z, targetStatus, true,
+-                ca.spottedleaf.concurrentutil.util.Priority.HIGHER,
++                intendingToBlock ? ca.spottedleaf.concurrentutil.util.Priority.BLOCKING : ca.spottedleaf.concurrentutil.util.Priority.NORMAL,
+                 complete
+             );
+ 
+@@ -404,8 +417,8 @@ public class ServerChunkCache extends ChunkSource implements ca.spottedleaf.moon
+             // can return now
+             return CompletableFuture.completedFuture(ChunkResult.of(ifPresent));
+         }
+-        // Paper end - rewrite chunk system
+     }
++    // Paper end - rewrite chunk system
+ 
+     private boolean chunkAbsent(final @Nullable ChunkHolder chunkHolder, final int targetTicketLevel) {
+         throw new UnsupportedOperationException(); // Paper - rewrite chunk system
